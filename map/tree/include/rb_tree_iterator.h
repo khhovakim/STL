@@ -1,5 +1,5 @@
-#ifndef   __RB_TREE_ITERATOR__
-# define  __RB_TREE_ITERATOR__
+#ifndef   RB_TREE_ITERATOR_
+# define  RB_TREE_ITERATOR_
 
 # include <bits/c++config.h>  // For std::ptrdiff_t
 # include <iterator>          // For std::bidirectional_iterator_tag
@@ -233,4 +233,4 @@ namespace cxx {
 
 } // namespace cxx
 
-#endif // __RB_TREE_ITERATOR__
+#endif // RB_TREE_ITERATOR_

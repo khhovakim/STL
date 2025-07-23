@@ -1,5 +1,5 @@
-#ifndef   __RB_TREE_NODE__
-# define  __RB_TREE_NODE__
+#ifndef   RB_TREE_NODE_
+# define  RB_TREE_NODE_
 
 # include "rb_tree_node_base.h"
 
@@ -24,4 +24,4 @@ namespace cxx {
 
 } // namespace cxx
 
-#endif // __RB_TREE_NODE__
+#endif // RB_TREE_NODE_

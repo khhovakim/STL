@@ -1,12 +1,12 @@
-#ifndef   __RB_TREE__
-# define  __RB_TREE__
+#ifndef   RB_TREE_
+# define  RB_TREE_
 
-# include <bits/c++config.h>  // For std::size_t
 # include <functional>        // For std::less
+# include <bits/c++config.h>  // For std::size_t
 
-# include "rb_tree_node_base.h"  // For rb_tree_node_base, rb_tree_node_color
+// # include "rb_tree_iterator.h"   // For rb_tree_iterator, rb_tree_const_iterator
 # include "rb_tree_node.h"       // For rb_tree_node
-# include "rb_tree_iterator.h"   // For rb_tree_iterator, rb_tree_const_iterator
+# include "rb_tree_node_base.h"  // For rb_tree_node_base, rb_tree_node_color
 
 namespace cxx {
 
@@ -15,15 +15,14 @@ namespace cxx {
   /// a self-balancing binary search tree. It ensures that the tree remains approximately
   /// balanced during insertions and deletions, providing efficient search, insertion,
   /// and deletion operations with O(log n) complexity.
-  /// @tparam ... Template parameters for val, comparator.
-  template <
-    typename Val,
-		typename Compare = std::less<Val>
-  > class rb_tree
-  {
+  /// @tparam Val The type of elements stored in the tree. Typically, a value type like `std::pair<const Key, T>` for associative containers.
+  /// @tparam Compare A binary predicate that defines the ordering of elements. It should return `true` if the first argument is considered to go before the second. Typically, `std::less<Key>`.
+
+  template<typename Val, typename Compare = std::less<Val>>
+  class rb_tree {
     public:
-      using value_type      =       Val       ;
-      using key_compare     =       Compare   ;
+      using value_type      =       Val        ;
+      using key_compare     =       Compare    ;
       using pointer         =       value_type*;
       using reference       =       value_type&;
       using const_pointer   = const value_type*;
@@ -31,11 +30,11 @@ namespace cxx {
       using size_type       =       std::size_t;
 
     private:
-      using _node_type      =       rb_tree_node<Val>       ;
+      using _node_type      =       rb_tree_node<Val>        ;
       using _base_type      =       rb_tree_node_base        ;
       using _color          =       rb_tree_node_base::_color;
-      using _node_ptr       =       rb_tree_node<Val>*      ;
-      using _const_node_ptr = const rb_tree_node<Val>*      ;
+      using _node_ptr       =       rb_tree_node<Val>*       ;
+      using _const_node_ptr = const rb_tree_node<Val>*       ;
       using _base_ptr       =       rb_tree_node_base *      ;
       using _const_base_ptr = const rb_tree_node_base *      ;
 
@@ -72,7 +71,8 @@ namespace cxx {
       /// @brief Returns the height of the subtree rooted at the given node.
       /// @param _ptr Pointer to the root of the subtree.
       /// @return Height of the subtree.
-      constexpr size_type height(_const_base_ptr _ptr) const;
+    [[nodiscard]]
+    constexpr size_type height(_const_base_ptr _ptr) const;
 
       /// @brief Returns the height of the entire tree.
       /// @return Height of the tree.
@@ -93,6 +93,7 @@ namespace cxx {
       /// @return Pointer to the newly created node.
       [[nodiscard]]
       constexpr _node_ptr createNode(const value_type& value) const;
+
       /// To Do impl _copy  helper function.
       /// To Do impl _clear helper function.
     private:
@@ -105,4 +106,4 @@ namespace cxx {
 
 } // namespace cxx
 
-#endif // __RB_TREE__
+#endif // RB_TREE_

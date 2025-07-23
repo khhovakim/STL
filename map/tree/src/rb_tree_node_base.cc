@@ -58,25 +58,25 @@ namespace cxx {
     return _x;
   }
 
-  constexpr const rb_tree_node_base*
+  const rb_tree_node_base*
   rb_tree_node_base::_minimum(const rb_tree_node_base* _x) noexcept
   {
     return _minimum(const_cast<rb_tree_node_base*>(_x));
   }
 
-  constexpr const rb_tree_node_base*
+  const rb_tree_node_base*
   rb_tree_node_base::_maximum(const rb_tree_node_base* _x) noexcept
   {
     return _maximum(const_cast<rb_tree_node_base*>(_x));
   }
 
-  constexpr const rb_tree_node_base*
+  const rb_tree_node_base*
   rb_tree_node_base::_next(const rb_tree_node_base* _x) noexcept
   {
     return _next(const_cast<rb_tree_node_base*>(_x));
   }
 
-  constexpr const rb_tree_node_base*
+  const rb_tree_node_base*
   rb_tree_node_base::_prev(const rb_tree_node_base* _x) noexcept
   {
     return _prev(const_cast<rb_tree_node_base*>(_x));
