@@ -3,83 +3,83 @@
 namespace cxx {
 
   constexpr rb_tree_node_base*
-  rb_tree_node_base::_next(rb_tree_node_base* __x) noexcept
+  rb_tree_node_base::_next(rb_tree_node_base* _x) noexcept
   {
-    if ( __x == nullptr ) {
+    if ( _x == nullptr ) {
       return nullptr;
     }
     
-    if ( __x->m_right ) {
-      return _minimum(__x->m_right);
+    if ( _x->m_right ) {
+      return _minimum(_x->m_right);
     }
     
-    _base_ptr __y = __x->m_parent;
-    while ( __y && __x == __y->m_right ) {
-      __x = __y;
-      __y = __y->m_parent;
+    _base_ptr _y = _x->m_parent;
+    while ( _y && _x == _y->m_right ) {
+      _x = _y;
+      _y = _y->m_parent;
     }
-    return __y;
+    return _y;
   }
 
   constexpr rb_tree_node_base*
-  rb_tree_node_base::_prev(rb_tree_node_base* __x) noexcept
+  rb_tree_node_base::_prev(rb_tree_node_base* _x) noexcept
   {
-    if ( __x == nullptr ) {
+    if ( _x == nullptr ) {
       return nullptr;
     }
     
-    if ( __x->m_left ) {
-      return _maximum(__x->m_left);
+    if ( _x->m_left ) {
+      return _maximum(_x->m_left);
     }
     
-    _base_ptr __y = __x->m_parent;
-    while ( __y && __x == __y->m_left ) {
-      __x = __y;
-      __y = __y->m_parent;
+    _base_ptr _y = _x->m_parent;
+    while ( _y && _x == _y->m_left ) {
+      _x = _y;
+      _y = _y->m_parent;
     }
-    return __y;
+    return _y;
   }
 
   constexpr rb_tree_node_base*
-  rb_tree_node_base::_minimum(rb_tree_node_base* __x) noexcept
+  rb_tree_node_base::_minimum(rb_tree_node_base* _x) noexcept
   {
-    while ( __x && __x->m_left ) {
-      __x = __x->m_left;
+    while ( _x && _x->m_left ) {
+      _x = _x->m_left;
     }
-    return __x;
+    return _x;
   }
 
   constexpr rb_tree_node_base*
-  rb_tree_node_base::_maximum(rb_tree_node_base* __x) noexcept
+  rb_tree_node_base::_maximum(rb_tree_node_base* _x) noexcept
   {
-    while ( __x && __x->m_right ) {
-      __x = __x->m_right;
+    while ( _x && _x->m_right ) {
+      _x = _x->m_right;
     }
-    return __x;
+    return _x;
   }
 
   constexpr const rb_tree_node_base*
-  rb_tree_node_base::_minimum(const rb_tree_node_base* __x) noexcept
+  rb_tree_node_base::_minimum(const rb_tree_node_base* _x) noexcept
   {
-    return _minimum(const_cast<rb_tree_node_base*>(__x));
+    return _minimum(const_cast<rb_tree_node_base*>(_x));
   }
 
   constexpr const rb_tree_node_base*
-  rb_tree_node_base::_maximum(const rb_tree_node_base* __x) noexcept
+  rb_tree_node_base::_maximum(const rb_tree_node_base* _x) noexcept
   {
-    return _maximum(const_cast<rb_tree_node_base*>(__x));
+    return _maximum(const_cast<rb_tree_node_base*>(_x));
   }
 
   constexpr const rb_tree_node_base*
-  rb_tree_node_base::_next(const rb_tree_node_base* __x) noexcept
+  rb_tree_node_base::_next(const rb_tree_node_base* _x) noexcept
   {
-    return _next(const_cast<rb_tree_node_base*>(__x));
+    return _next(const_cast<rb_tree_node_base*>(_x));
   }
 
   constexpr const rb_tree_node_base*
-  rb_tree_node_base::_prev(const rb_tree_node_base* __x) noexcept
+  rb_tree_node_base::_prev(const rb_tree_node_base* _x) noexcept
   {
-    return _prev(const_cast<rb_tree_node_base*>(__x));
+    return _prev(const_cast<rb_tree_node_base*>(_x));
   }
 
 }

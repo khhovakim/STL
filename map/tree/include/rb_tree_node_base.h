@@ -25,52 +25,52 @@ namespace cxx {
     _color        m_color  { _color::Black }; ///< Color of the node (red or black).
 
     /// @brief Minimum node in the subtree.
-    /// @param __x Pointer to the node from which to find the minimum.
+    /// @param _x Pointer to the node from which to find the minimum.
     /// @return Pointer to the minimum node in the subtree rooted at `__x`.
     constexpr static _base_ptr
-    _minimum(_base_ptr __x) noexcept;
+    _minimum(_base_ptr _x) noexcept;
 
     /// @brief Maximum node in the subtree.
-    /// @param __x Pointer to the node from which to find the maximum.
+    /// @param _x Pointer to the node from which to find the maximum.
     /// @return Pointer to the maximum node in the subtree rooted at `__x`.
     constexpr static _base_ptr
-    _maximum(_base_ptr __x) noexcept;
+    _maximum(_base_ptr _x) noexcept;
 
     /// @brief Minimum node in the subtree (const version).
-    /// @param __x Pointer to the node from which to find the minimum.
+    /// @param _x Pointer to the node from which to find the minimum.
     /// @return Const pointer to the minimum node in the subtree rooted at `__x`.
     constexpr static _const_base_ptr
-    _minimum(_const_base_ptr __x) noexcept;
+    _minimum(_const_base_ptr _x) noexcept;
 
     /// @brief Maximum node in the subtree (const version).
-    /// @param __x Pointer to the node from which to find the maximum.
+    /// @param _x Pointer to the node from which to find the maximum.
     /// @return Const pointer to the maximum node in the subtree rooted at `__x`.
     constexpr static _const_base_ptr
-    _maximum(_const_base_ptr __x) noexcept;
+    _maximum(_const_base_ptr _x) noexcept;
 
     /// @brief Get the next node in the in-order traversal.
-    /// @param __x Pointer to the current node.
+    /// @param _x Pointer to the current node.
     /// @return Pointer to the next node in the in-order traversal.
     constexpr static _base_ptr
-    _next(_base_ptr __x) noexcept;
+    _next(_base_ptr _x) noexcept;
 
     /// @brief Get the previous node in the in-order traversal.
-    /// @param __x Pointer to the current node.
+    /// @param _x Pointer to the current node.
     /// @return Pointer to the previous node in the in-order traversal.
     constexpr static _base_ptr
-    _prev(_base_ptr __x) noexcept;
+    _prev(_base_ptr _x) noexcept;
 
     /// @brief Get the next node in the in-order traversal (const version).
-    /// @param __x Pointer to the current node.
+    /// @param _x Pointer to the current node.
     /// @return Const pointer to the next node in the in-order traversal.
     constexpr static _const_base_ptr
-    _next(_const_base_ptr __x) noexcept;
+    _next(_const_base_ptr _x) noexcept;
 
     /// @brief Get the previous node in the in-order traversal (const version).
-    /// @param __x Pointer to the current node.
+    /// @param _x Pointer to the current node.
     /// @return Const pointer to the previous node in the in-order traversal.
     constexpr static _const_base_ptr
-    _prev(_const_base_ptr __x) noexcept;
+    _prev(_const_base_ptr _x) noexcept;
 
   };
 

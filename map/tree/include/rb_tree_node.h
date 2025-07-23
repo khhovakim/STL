@@ -17,8 +17,8 @@ namespace cxx {
 
     ValueType m_valueField { }; ///< The value stored in the node.
     
-    rb_tree_node(const ValueType& __val)
-      : rb_tree_node_base { }, m_valueField{ __val }
+    explicit rb_tree_node(const ValueType& _val)
+      : rb_tree_node_base { }, m_valueField{ _val }
     { }
   };
 

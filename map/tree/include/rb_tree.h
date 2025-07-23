@@ -17,13 +17,13 @@ namespace cxx {
   /// and deletion operations with O(log n) complexity.
   /// @tparam ... Template parameters for val, comparator.
   template <
-    typename _Val,
-		typename _Compare = std::less<_Val>
+    typename Val,
+		typename Compare = std::less<Val>
   > class rb_tree
   {
     public:
-      using value_type      =       _Val       ;
-      using key_compare     =       _Compare   ;
+      using value_type      =       Val       ;
+      using key_compare     =       Compare   ;
       using pointer         =       value_type*;
       using reference       =       value_type&;
       using const_pointer   = const value_type*;
@@ -31,17 +31,17 @@ namespace cxx {
       using size_type       =       std::size_t;
 
     private:
-      using _node_type      =       rb_tree_node<_Val>       ;
+      using _node_type      =       rb_tree_node<Val>       ;
       using _base_type      =       rb_tree_node_base        ;
       using _color          =       rb_tree_node_base::_color;
-      using _node_ptr       =       rb_tree_node<_Val>*      ;
-      using _const_node_ptr = const rb_tree_node<_Val>*      ;
+      using _node_ptr       =       rb_tree_node<Val>*      ;
+      using _const_node_ptr = const rb_tree_node<Val>*      ;
       using _base_ptr       =       rb_tree_node_base *      ;
       using _const_base_ptr = const rb_tree_node_base *      ;
 
 
     public:
-      constexpr rb_tree(const key_compare& comp = key_compare())
+      constexpr explicit rb_tree(const key_compare& comp = key_compare())
         : m_comp{ comp }, m_size{ 0 }, m_root{ nullptr }, m_nil{ nullptr }
       {
         m_nil  = new _base_type;
@@ -50,38 +50,42 @@ namespace cxx {
         m_nil->m_parent = m_root;
       }
 
-      constexpr rb_tree(const rb_tree& __x)
-        : rb_tree{ __x.m_comp }
+      constexpr rb_tree(const rb_tree& _x)
+        : rb_tree{ _x.m_comp }
       {
         // _copy(__x.m_root, __x.m_nil);
-        m_size = __x.m_size;
+        m_size = _x.m_size;
       }
 
-      constexpr rb_tree& operator=(const rb_tree& __x);
+      constexpr rb_tree& operator=(const rb_tree& _x);
 
       // constexpr ~rb_tree() { _clear(m_root); }
       
     public:
       /// @brief Returns the number of elements in the tree.
+      [[nodiscard]]
       constexpr size_type size() const { return m_size; }
 
       /// @brief Returns a pointer to the root node of the tree.
       constexpr _const_node_ptr getRoot() const { return m_root; }
 
       /// @brief Returns the height of the subtree rooted at the given node.
-      /// @param __ptr Pointer to the root of the subtree.
+      /// @param _ptr Pointer to the root of the subtree.
       /// @return Height of the subtree.
-      constexpr size_type height(_const_base_ptr __ptr) const;
+      constexpr size_type height(_const_base_ptr _ptr) const;
 
       /// @brief Returns the height of the entire tree.
       /// @return Height of the tree.
+      [[nodiscard]]
       constexpr size_type height() const { return height(m_root); }
 
       /// @brief Returns a pointer to the nil (sentinel) node of the tree.
+      [[nodiscard]]
       constexpr _const_base_ptr getNil() const { return m_nil; }
 
       /// @brief Checks if the tree is empty.
       /// @return true if the tree contains no elements, false otherwise.
+      [[nodiscard]]
       constexpr bool empty() const noexcept { return m_size == 0; }
 
       /// @brief Creates a new node with the given value.

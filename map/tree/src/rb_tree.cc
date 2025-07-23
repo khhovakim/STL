@@ -9,39 +9,39 @@ namespace cxx {
 
   template <typename Val, typename Com>
   constexpr rb_tree<Val, Com>&
-  rb_tree<Val, Com>::operator=(const rb_tree<Val, Com>& __x)
+  rb_tree<Val, Com>::operator=(const rb_tree<Val, Com>& _x)
   {
-    if ( this == &__x ) {
+    if ( this == &_x ) {
       return *this;
     }
 
     // _clear(m_root);
-    m_comp = __x.m_comp;
+    m_comp = _x.m_comp;
     m_root = m_nil;
     // _copy(__x.m_root, __x.m_nil);
-    m_size = __x.m_size;
+    m_size = _x.m_size;
     return *this;
   }
 
   template <typename Val, typename Com>
   constexpr std::size_t
-  rb_tree<Val, Com>::height(const rb_tree_node_base* __ptr) const
+  rb_tree<Val, Com>::height(const rb_tree_node_base* _ptr) const
   {
-    if (__ptr == m_nil) {
+    if (_ptr == m_nil) {
       return 0;
     }
 
-    size_type __l = height(__ptr->m_left);
-    size_type __r = height(__ptr->m_right);
-    return 1 + (__l > __r ? __l : __r);
+    const size_type _l = height(_ptr->m_left);
+    const size_type _r = height(_ptr->m_right);
+    return 1 + (_l > _r ? _l : _r);
   }
 
   template <typename Val, typename Com>
   constexpr rb_tree_node<Val>*
-  rb_tree<Val, Com>::createNode(const Val& __val) const
+  rb_tree<Val, Com>::createNode(const Val& _val) const
   {
-    _node_ptr __node = new _node_type{ __val };
-    return __node;
+    auto _node = new _node_type{ _val };
+    return _node;
   }
 
 }
