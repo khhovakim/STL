@@ -1,8 +1,8 @@
 #ifndef   RB_TREE_ITERATOR_
 # define  RB_TREE_ITERATOR_
 
-# include <bits/c++config.h>  // For std::ptrdiff_t
-# include <iterator>          // For std::bidirectional_iterator_tag
+# include <bits/c++config.h>                // For std::ptrdiff_t
+# include <bits/stl_iterator_base_types.h>  // For std::bidirectional_iterator_tag
 
 # include "rb_tree_node_base.h" // For rb_tree_node_base
 # include "rb_tree_node.h"      // For rb_tree_node
@@ -13,53 +13,54 @@ namespace cxx {
     /// It supports both read and write access to the elements of the tree.
     template<typename T>
     struct rb_tree_iterator {
-        /// @brief Type alias for the value type stored in the iterator.
-        /// This type is used to define the type of elements that the iterator will point to.
-        /// It is typically the same as the type of the values stored in the red-black tree nodes.
+    private:
+        using _self                 = rb_tree_iterator<T>;
+        using _ptr_base             = rb_tree_node_base *;
+        using _const_ptr_const_base = const rb_tree_node_base * const;
+        using _ptr_node             = rb_tree_node<T> *;
+
+    public:
         using value_type = T;
-        using reference = T &;
-        using pointer = T *;
+        using reference  = T &;
+        using pointer    = T *;
 
         using iterator_category = std::bidirectional_iterator_tag;
-        using difference_type = std::ptrdiff_t;
-
-        using _self = rb_tree_iterator<T>;
-        using _base_ptr = rb_tree_node_base *;
-        using _node_ptr = rb_tree_node<T> *;
+        using difference_type   = std::ptrdiff_t;
 
         /// @brief Default constructor.
         /// Initializes the iterator with a null node pointer.
         constexpr
         rb_tree_iterator()
-            : m_node{nullptr} {
+            : m_node{nullptr}, m_nil{nullptr} {
         }
 
         /// @brief Constructor with a base pointer.
         /// Initializes the iterator with the given base pointer.
-        /// @param _x Pointer to the base node.
+        /// @param _x   Pointer to the base node.
+        /// @param _nil Pointer to the nil  node.
         constexpr explicit
-        rb_tree_iterator(_node_ptr _x)
-            : m_node{_x} {
+        rb_tree_iterator(_ptr_node _x, _const_ptr_const_base _nil)
+            : m_node{_x}, m_nil{_nil} {
         }
 
         /// @brief Dereference operator.
         /// Returns a reference to the value stored in the node pointed to by the iterator.
         /// @return Reference to the value.
         constexpr reference
-        operator*() const noexcept { return static_cast<_node_ptr>(m_node)->m_valueField; }
+        operator*() const noexcept { return static_cast<_ptr_node>(m_node)->m_valueField; }
 
         /// @brief Arrow operator.
         /// Returns a pointer to the value stored in the node pointed to by the iterator.
         /// @return Pointer to the value.
         constexpr pointer
-        operator->() const noexcept { return &static_cast<_node_ptr>(m_node)->m_valueField; }
+        operator->() const noexcept { return &static_cast<_ptr_node>(m_node)->m_valueField; }
 
         /// @brief Pre-increment operator.
         /// Moves the iterator to the next node in the tree.
         /// @return Reference to the updated iterator.
         constexpr _self &
         operator++() {
-            m_node = rb_tree_node_base::_next(m_node);
+            m_node = rb_tree_node_base::_next(m_node, m_nil);
             return *this;
         }
 
@@ -69,7 +70,7 @@ namespace cxx {
         constexpr _self
         operator++(int) {
             _self _tmp = *this; // Create a copy of the current iterator
-            m_node = rb_tree_node_base::_next(m_node); // Move to the next node
+            m_node = rb_tree_node_base::_next(m_node, m_nil); // Move to the next node
             return _tmp; // Return the copy
         }
 
@@ -78,7 +79,7 @@ namespace cxx {
         /// @return Reference to the updated iterator.
         constexpr _self &
         operator--() {
-            m_node = rb_tree_node_base::_prev(m_node);
+            m_node = rb_tree_node_base::_prev(m_node, m_nil);
             return *this;
         }
 
@@ -88,7 +89,7 @@ namespace cxx {
         constexpr _self
         operator--(int) {
             _self _tmp = *this; // Create a copy of the current iterator
-            m_node = rb_tree_node_base::_prev(m_node); // Move to the previous node
+            m_node = rb_tree_node_base::_prev(m_node, m_nil); // Move to the previous node
             return _tmp; // Return the copy
         }
 
@@ -106,7 +107,8 @@ namespace cxx {
         constexpr bool
         operator!=(const _self &_x) const { return m_node != _x.m_node; }
 
-        _base_ptr m_node; ///< Pointer to the current node in the tree.
+        _ptr_base m_node;            ///< Pointer to the current node in the tree.
+        _const_ptr_const_base m_nil; ///< Pointer to the nil in the tree.
     };
 } // namespace cxx
 
@@ -116,59 +118,63 @@ namespace cxx {
     /// It supports read-only access to the elements of the tree.
     template<typename T>
     struct rb_tree_const_iterator {
+    private:
+        using _iterator       = rb_tree_iterator<T>;
+        using _self           = rb_tree_const_iterator<T>;
+        using _ptr_base       = const rb_tree_node_base *;
+        using _const_ptr_base = const rb_tree_node_base * const;
+        using _ptr_node       = const rb_tree_node<T> *;
+
+    public:
         using value_type = T;
-        using reference = const T &;
-        using pointer = const T *;
+        using reference  = const T &;
+        using pointer    = const T *;
 
         using iterator_category = std::bidirectional_iterator_tag;
-        using difference_type = std::ptrdiff_t;
-
-        using iterator = rb_tree_iterator<T>;
-        using _self = rb_tree_const_iterator<T>;
-        using _base_ptr = rb_tree_node_base *;
-        using _node_ptr = rb_tree_node<T> *;
+        using difference_type   = std::ptrdiff_t;
 
         /// @brief Default constructor.
         /// Initializes the const iterator with a null node pointer.
         constexpr
         rb_tree_const_iterator()
-            : m_node{nullptr} {
+            : m_node{nullptr}, m_nil{nullptr} {
         }
 
         /// @brief Constructor with a base pointer.
         /// Initializes the const iterator with the given base pointer.
         /// @param _x Pointer to the base node.
+        /// @param _nil Pointer to the nil  node.
         constexpr explicit
-        rb_tree_const_iterator(_node_ptr _x)
-            : m_node{_x} {
+        rb_tree_const_iterator(_ptr_node _x, _const_ptr_base _nil)
+            : m_node{_x}, m_nil {_nil} {
         }
 
         /// @brief Copy constructor from a non-const iterator.
         /// Initializes the const iterator with a non-const iterator.
         /// @param _x The non-const iterator to copy from.
         constexpr explicit
-        rb_tree_const_iterator(const iterator &_x)
-            : m_node{_x.m_node} {
+        rb_tree_const_iterator(const _iterator& _x)
+            : m_node{_x.m_node}, m_nil{_x.m_nil} {
         }
 
         /// @brief Dereference operator.
         /// Returns a reference to the value stored in the node pointed to by the const iterator.
         /// @return Reference to the value.
         constexpr reference
-        operator*() const noexcept { return static_cast<_node_ptr>(m_node)->m_valueField; }
+        operator*() const noexcept { return static_cast<_ptr_node>(m_node)->m_valueField; }
 
         /// @brief Arrow operator.
         /// Returns a pointer to the value stored in the node pointed to by the const iterator.
         /// @return Pointer to the value.
         constexpr pointer
-        operator->() const noexcept { return &static_cast<_node_ptr>(m_node)->m_valueField; }
+        operator->() const noexcept { return &static_cast<_ptr_node>(m_node)->m_valueField; }
 
         /// @brief Pre-increment operator.
         /// Moves the const iterator to the next node in the tree.
         /// @return Reference to the updated const iterator.
         constexpr _self &
         operator++() {
-            m_node = rb_tree_node_base::_next(m_node);
+            m_node = rb_tree_node_base::_next(m_node, m_nil);
             return *this;
         }
 
@@ -178,7 +184,7 @@ namespace cxx {
         constexpr _self
         operator++(int) {
             _self _tmp = *this; // Create a copy of the current const iterator
-            m_node = rb_tree_node_base::_next(m_node); // Move to the next node
+            m_node = rb_tree_node_base::_next(m_node, m_nil); // Move to the next node
             return _tmp; // Return the copy
         }
 
@@ -187,7 +193,7 @@ namespace cxx {
         /// @return Reference to the updated const iterator.
         constexpr _self &
         operator--() {
-            m_node = rb_tree_node_base::_prev(m_node);
+            m_node = rb_tree_node_base::_prev(m_node, m_nil);
             return *this;
         }
 
@@ -197,7 +203,7 @@ namespace cxx {
         constexpr _self
         operator--(int) {
             _self _tmp = *this; // Create a copy of the current const iterator
-            m_node = rb_tree_node_base::_prev(m_node); // Move to the previous node
+            m_node = rb_tree_node_base::_prev(m_node, m_nil); // Move to the previous node
             return _tmp; // Return the copy
         }
 
@@ -215,7 +221,8 @@ namespace cxx {
         constexpr bool
         operator!=(const _self &_x) const { return m_node != _x.m_node; }
 
-        _base_ptr m_node; ///< Pointer to the current node in the tree.
+        _ptr_base m_node;      ///< Pointer to the current node in the tree.
+        _const_ptr_base m_nil; ///< Pointer to the nil node in the tree.
     };
 } // namespace cxx
 

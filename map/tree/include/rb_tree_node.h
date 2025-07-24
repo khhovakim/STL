@@ -11,7 +11,7 @@ namespace cxx {
     /// allowing for efficient insertion, deletion, and traversal operations.
     template<typename ValueType>
     struct rb_tree_node : public rb_tree_node_base {
-        using _node_ptr = rb_tree_node<ValueType> *; ///< Pointer type for the node.
+        using _ptr_node = rb_tree_node<ValueType> *; ///< Pointer type for the node.
 
         ValueType m_valueField{}; ///< The value stored in the node.
 
