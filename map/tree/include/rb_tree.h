@@ -3,8 +3,7 @@
 
 # include <bits/c++config.h>     // For std::size_t
 # include <bits/stl_function.h>  // For std::less, std::_Select1st
-// # include <bits/stl_pair.h>      // For std::pair
-
+# include <bits/stl_pair.h>      // For std::pair
 # include "rb_tree_iterator.h"   // For rb_tree_iterator, rb_tree_const_iterator
 # include "rb_tree_node.h"       // For rb_tree_node
 # include "rb_tree_node_base.h"  // For rb_tree_node_base, rb_tree_node_color
@@ -159,6 +158,16 @@ namespace cxx {
         [[nodiscard]]
         const_iterator cend()   const { return const_iterator{m_nil, m_nil}; }
 
+    public:
+        /// @brief Inserts a value into the Red-Black Tree.
+        /// @param _val The value to insert into the tree.
+        /// @return A pair consisting of:
+        ///   - an iterator to the inserted element (or to the existing one if insertion failed),
+        ///   - a boolean indicating whether the insertion took place (`true` if inserted, `false` if already present).
+        std::pair<iterator, bool> insert(const value_type &_val) {
+            _ptr_node _node = new _node_type{_val};
+            return _insert(_node);
+        }
     private:
         /// @brief Computes the height of the subtree rooted at the given node.
         /// This internal helper function calculates the height of a subtree, defined as
@@ -197,6 +206,19 @@ namespace cxx {
         constexpr static _ptr_node
         _search(_ptr_const_node _ptr, _const_ptr_const_base _nil, const value_type &_val);
 
+        /// @brief Internal helper to insert a node into the Red-Black Tree.
+        /// @param _node Pointer to the node to insert.
+        /// @return A pair consisting of:
+        ///   - an iterator to the inserted node (or to the existing one if a duplicate key is found),
+        ///   - a boolean indicating whether the insertion was successful (`true` if inserted, `false` if duplicate).
+        std::pair<iterator, bool> _insert(_ptr_node _node);
+
+        /// @brief Restores Red-Black Tree properties after insertion.
+        /// This internal function is called after inserting a node to fix any violations
+        /// of Red-Black Tree properties (such as two consecutive red nodes). It performs
+        /// the necessary re-coloring and rotations to maintain the tree's balance.
+        /// @param _node Pointer to the newly inserted node that may violate Red-Black rules.
+        void _insertFixUp(_ptr_node _node);
     private:
         key_compare m_comp;
         size_type m_size;
@@ -255,11 +277,47 @@ namespace cxx {
             return ;
         }
 
-        // ToDo impl insert function
-        // _ptr_node _copyNode = new _node_type{_node->m_valueField};
-        // insert(_copyNode);
+        insert(_node->m_valueField);
         _copy(_node->m_left, _nil);
         _copy(_node->m_right, _nil);
+    }
+
+    template<typename Val, typename KeyOfVal, typename Compare>
+    std::pair<typename rb_tree<Val, KeyOfVal, Compare>::iterator, bool>
+    rb_tree<Val, KeyOfVal,Compare>::_insert(_ptr_node _node) {
+        _ptr_node _current { m_root };
+        _ptr_node _parent  { m_nil  };
+
+        while ( _current != m_nil ) {
+            _parent = _current;
+            if ( !_compare(_node->m_valueField, _current->m_valueField) &&
+                 !_compare(_current->m_valueField, _node->m_valueField) ) {
+                return std::make_pair(iterator{_current, m_nil}, false);
+            }
+
+            if ( _compare(_node->m_valueField, _current->m_valueField) ) {
+                _current = _current->m_left;
+            } else {
+                _current = _current->m_right;
+            }
+        }
+
+        _node->m_parent = _parent;
+        if ( _parent == m_nil ) {
+            m_root = _node;
+        } else if ( _compare(_node->m_valueField, _parent->m_valueField) ) {
+            _parent->m_left = _node;
+        } else {
+            _parent->m_right = _node;
+        }
+
+        ++m_size;
+        _insertFixUp(_node);
+        return std::make_pair(iterator{_node, m_nil}, true);
+    }
+
+    template<typename Val, typename KeyOfVal, typename Compare>
+    void rb_tree<Val, KeyOfVal, Compare>::_insertFixUp(_ptr_node _node) {
     }
 
     template<typename Val, typename KeyOfVal, typename Compare>

@@ -7,8 +7,8 @@ namespace cxx {
     /// - `red`: Represents a red node in the tree.
     /// - `black`: Represents a black node in the tree.
     enum class rb_tree_node_color {
-        Red = false, ///< Represents a red node in the tree.
-        Black = true ///< Represents a black node in the tree.
+        Red   = false, ///< Represents a red node in the tree.
+        Black = true   ///< Represents a black node in the tree.
     };
 
     /// @brief Base class for red-black tree nodes.
@@ -22,9 +22,9 @@ namespace cxx {
         using _const_ptr_const_base = const rb_tree_node_base * const;
 
         _ptr_base m_parent{nullptr}; ///< Pointer to the parent node.
-        _ptr_base m_left{nullptr}; ///< Pointer to the left child node.
-        _ptr_base m_right{nullptr}; ///< Pointer to the right child node.
-        _color m_color{_color::Black}; ///< Color of the node (red or black).
+        _ptr_base m_left{nullptr};   ///< Pointer to the left child node.
+        _ptr_base m_right{nullptr};  ///< Pointer to the right child node.
+        _color m_color{_color::Red}; ///< Color of the node (red or black).
 
         /// @brief Minimum node in the subtree.
         /// @param _x Pointer to the node from which to find the minimum.
