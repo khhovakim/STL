@@ -4,8 +4,8 @@
 # include <bits/c++config.h>                // For std::ptrdiff_t
 # include <bits/stl_iterator_base_types.h>  // For std::bidirectional_iterator_tag
 
-# include "rb_tree_node_base.h" // For rb_tree_node_base
-# include "rb_tree_node.h"      // For rb_tree_node
+#include "rb_tree_node_base.h"
+#include "rb_tree_node.h"
 
 namespace cxx {
     /// @brief Iterator for red-black trees.
@@ -14,7 +14,7 @@ namespace cxx {
     template<typename T>
     struct rb_tree_iterator {
     private:
-        using _self                 = rb_tree_iterator<T>;
+        using _self                 = rb_tree_iterator;
         using _ptr_base             = rb_tree_node_base *;
         using _const_ptr_const_base = const rb_tree_node_base * const;
         using _ptr_node             = rb_tree_node<T> *;
@@ -120,7 +120,7 @@ namespace cxx {
     struct rb_tree_const_iterator {
     private:
         using _iterator       = rb_tree_iterator<T>;
-        using _self           = rb_tree_const_iterator<T>;
+        using _self           = rb_tree_const_iterator;
         using _ptr_base       = const rb_tree_node_base *;
         using _const_ptr_base = const rb_tree_node_base * const;
         using _ptr_node       = const rb_tree_node<T> *;

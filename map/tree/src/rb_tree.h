@@ -4,9 +4,9 @@
 # include <bits/c++config.h>     // For std::size_t
 # include <bits/stl_function.h>  // For std::less, std::_Select1st
 # include <bits/stl_pair.h>      // For std::pair
-# include "rb_tree_iterator.h"   // For rb_tree_iterator, rb_tree_const_iterator
-# include "rb_tree_node.h"       // For rb_tree_node
-# include "rb_tree_node_base.h"  // For rb_tree_node_base, rb_tree_node_color
+#include "rb_tree_iterator.h"
+#include "rb_tree_node.h"
+#include "rb_tree_node_base.h"
 
 namespace cxx {
     /// @brief Red-Black Tree implementation.
@@ -14,21 +14,19 @@ namespace cxx {
     /// a self-balancing binary search tree. It ensures that the tree remains approximately
     /// balanced during insertions and deletions, providing efficient search, insertion,
     /// and deletion operations with O(log n) complexity.
+    /// @tparam Key Key The type of keys used for ordering elements in the Red-Black Tree.
     /// @tparam Val The type of elements stored in the tree.
     ///             Typically, a value type like `std::pair<const Key, T>` for associative containers.
-    /// @tparam KeyOfVal A functor that extracts the key from a value, allowing the tree to be
-    ///                  used with associative containers like maps or sets.
     /// @tparam Compare A binary predicate that defines the ordering of elements.
     ///                 It should return `true` if the first argument is considered to go before the second.
     ///                 Typically, `std::less<Key>`.
 
     template<
+        typename Key,
         typename Val,
-        typename KeyOfVal = std::_Select1st<Val>,
-        typename Compare  = std::less<KeyOfVal>
+        typename Compare  = std::less<Key>
     >
     class rb_tree {
-    private:
         using _node_type            = rb_tree_node<Val>;
         using _base_type            = rb_tree_node_base;
         using _color                = rb_tree_node_base::_color;
@@ -40,6 +38,7 @@ namespace cxx {
 
     public:
         using value_type      = Val;
+        using key_type        = Key;
         using key_compare     = Compare;
         using pointer         = value_type *;
         using reference       = value_type &;
@@ -67,7 +66,6 @@ namespace cxx {
             _clear(m_root);
         }
 
-    public:
         /// @brief Returns the number of elements in the tree.
         [[nodiscard]]
         constexpr size_type size() const {
@@ -124,7 +122,6 @@ namespace cxx {
             return _search(m_root, m_nil, _val);
         }
 
-    public:
         using iterator       = rb_tree_iterator<value_type>;
         using const_iterator = rb_tree_const_iterator<value_type>;
 
@@ -158,7 +155,6 @@ namespace cxx {
         [[nodiscard]]
         const_iterator cend()   const { return const_iterator{m_nil, m_nil}; }
 
-    public:
         /// @brief Inserts a value into the Red-Black Tree.
         /// @param _val The value to insert into the tree.
         /// @return A pair consisting of:
@@ -194,8 +190,10 @@ namespace cxx {
         /// @param _x The first value to compare.
         /// @param _y The second value to compare.
         /// @return `true` if the key of `_x` is less than the key of `_y`, otherwise `false`.
-        constexpr static bool _compare(const value_type& _x, const value_type& _y) {
-            return m_comp(KeyOfVal()(_x), KeyOfVal()(_y));
+        bool _compare(const value_type& _x, const value_type& _y) {
+            const key_type keyX = std::_Select1st<value_type>()(_x);
+            const key_type keyY = std::_Select1st<value_type>()(_y);
+            return m_comp(keyX, keyY);
         }
 
         /// @brief Recursively searches for a node with the given value starting from a specific node.
@@ -203,7 +201,7 @@ namespace cxx {
         /// @param _nil Sentinel node used to represent leaf/null nodes.
         /// @param _val The value to search for (comparison is based on the key extracted from it).
         /// @return Pointer to the node containing the value, or `_nil` if not found.
-        constexpr static _ptr_node
+        constexpr _ptr_node
         _search(_ptr_const_node _ptr, _const_ptr_const_base _nil, const value_type &_val);
 
         /// @brief Internal helper to insert a node into the Red-Black Tree.
@@ -218,8 +216,34 @@ namespace cxx {
         /// of Red-Black Tree properties (such as two consecutive red nodes). It performs
         /// the necessary re-coloring and rotations to maintain the tree's balance.
         /// @param _node Pointer to the newly inserted node that may violate Red-Black rules.
-        void _insertFixUp(_ptr_node _node);
-    private:
+        static void _insert_fix_up(_ptr_node _node);
+
+        /// @brief Resolves the red-uncle case in Red-Black Tree insertion.
+        ///
+        /// This function handles the case when both the parent and the uncle of the newly inserted node are red.
+        /// It recolors the parent and uncle to black and the grandparent to red, then the fix-up continues from
+        /// the grandparent. This helps maintain the Red-Black Tree properties after insertion.
+        ///
+        /// @param _parent Pointer to the parent of the newly inserted node.
+        /// @param _uncle Pointer to the uncle of the newly inserted node (i.e., sibling of the parent).
+        /// @note This function only performs recoloring; no rotations are done here.
+        /// @see _insertFixUp()
+        static void _resolve_red_uncle(_ptr_base _parent, _ptr_base _uncle) noexcept;
+
+        /// @brief Resolves Red-Black Tree insertion cases when the parent is red and the uncle is black or null.
+        ///
+        /// This function handles the violation of Red-Black Tree properties caused by a red parent
+        /// and a black (or null) uncle. It performs necessary rotations and recoloring to restore balance,
+        /// typically corresponding to **Case 2** and **Case 3** in Red-Black Tree insertion fix-up.
+        ///
+        /// @param _parent Pointer to the parent node of the newly inserted node.
+        /// @note This function assumes the uncle is black or null and that the grandparent exists.
+        /// @see _insertFixUp()
+        static void _resolve_red_parent(_ptr_base _parent) noexcept;
+
+        static void _right_rotate(_ptr_node _node) noexcept;
+        static void _left_rotate(_ptr_node _node) noexcept;
+
         key_compare m_comp;
         size_type m_size;
         _ptr_node m_root;
@@ -231,9 +255,9 @@ namespace cxx {
 
 // Red-Black Tree implementation
 namespace cxx {
-    template<typename Val, typename KeyOfVal, typename Com>
-    rb_tree<Val, KeyOfVal, Com> &
-    rb_tree<Val, KeyOfVal, Com>::operator=(const rb_tree &_x) {
+    template<typename Key, typename Val, typename Compare>
+    rb_tree<Key, Val, Compare> &
+    rb_tree<Key, Val, Compare>::operator=(const rb_tree &_x) {
         if (this == &_x) {
             return *this;
         }
@@ -246,9 +270,9 @@ namespace cxx {
         return *this;
     }
 
-    template<typename Val, typename KeyOfVal, typename Com>
+    template<typename Key, typename Val, typename Compare>
     constexpr std::size_t
-    rb_tree<Val, KeyOfVal, Com>::_height(const rb_tree_node_base *_ptr) const {
+    rb_tree<Key, Val, Compare>::_height(const rb_tree_node_base *_ptr) const {
         if (_ptr == m_nil) {
             return 0;
         }
@@ -258,8 +282,8 @@ namespace cxx {
         return 1 + (_l > _r ? _l : _r);
     }
 
-    template<typename Val, typename KeyOfVal, typename Com>
-    void rb_tree<Val, KeyOfVal, Com>::_clear(_ptr_node _node) {
+    template<typename Key, typename Val, typename Compare>
+    void rb_tree<Key, Val, Compare>::_clear(_ptr_node _node) {
         if (_node == m_nil) {
             return ;
         }
@@ -270,8 +294,8 @@ namespace cxx {
         --m_size;
     }
 
-    template<typename Val, typename KeyOfVal, typename Com>
-    void rb_tree<Val, KeyOfVal, Com>::
+    template<typename Key, typename Val, typename Compare>
+    void rb_tree<Key, Val, Compare>::
     _copy(_ptr_const_node _node, _const_ptr_const_base _nil) {
         if (_node == _nil) {
             return ;
@@ -282,16 +306,34 @@ namespace cxx {
         _copy(_node->m_right, _nil);
     }
 
-    template<typename Val, typename KeyOfVal, typename Compare>
-    std::pair<typename rb_tree<Val, KeyOfVal, Compare>::iterator, bool>
-    rb_tree<Val, KeyOfVal,Compare>::_insert(_ptr_node _node) {
+    template<typename Key, typename Val, typename Compare>
+    constexpr rb_tree_node<Val> *rb_tree<Key, Val, Compare>::
+    _search(_ptr_const_node _ptr, _const_ptr_const_base _nil, const value_type &_val) {
+        if ( _ptr == _nil ) {
+            return _ptr;
+        }
+
+        if ( _compare(_ptr->m_valueField, _val) ) {
+            return _search(_ptr->m_right, _nil, _val);
+        }
+
+        if ( _compare(_val, _ptr->m_valueField) ) {
+            return _search(_ptr->m_left, _nil, _val);
+        }
+
+        return _ptr;
+    }
+
+    template<typename Key, typename Val, typename Compare>
+    std::pair<typename rb_tree<Key, Val, Compare>::iterator, bool>
+    rb_tree<Key, Val, Compare>::_insert(_ptr_node _node) {
         _ptr_node _current { m_root };
         _ptr_node _parent  { m_nil  };
 
         while ( _current != m_nil ) {
             _parent = _current;
             if ( !_compare(_node->m_valueField, _current->m_valueField) &&
-                 !_compare(_current->m_valueField, _node->m_valueField) ) {
+                !_compare(_current->m_valueField, _node->m_valueField) ) {
                 return std::make_pair(iterator{_current, m_nil}, false);
             }
 
@@ -312,30 +354,73 @@ namespace cxx {
         }
 
         ++m_size;
-        _insertFixUp(_node);
+        _insert_fix_up(_node);
         return std::make_pair(iterator{_node, m_nil}, true);
     }
 
-    template<typename Val, typename KeyOfVal, typename Compare>
-    void rb_tree<Val, KeyOfVal, Compare>::_insertFixUp(_ptr_node _node) {
+    template<typename Key, typename Val, typename Compare>
+    void rb_tree<Key, Val, Compare>::_insert_fix_up(_ptr_node _node) {
+        while ( _node->m_parent->m_color == _color::Red ) {
+            if ( _node->m_parent == _node->m_parent->m_parent->m_left ) {
+                _ptr_base _uncle = _node->m_parent->m_parent->m_right;
+                if ( _uncle->m_color == _color::Red ) {
+                    // Case 1: Uncle is red
+                    _resolve_red_uncle(_node->m_parent, _uncle);
+                    _node = _node->m_parent->m_parent;
+                } else {
+                    if ( _node == _node->m_parent->m_right ) {
+                        // Case 2: Uncle is BLACK and _node is a right child
+                        _node = _node->m_parent;
+                        _left_rotate(_node);
+                    }
+                    // Case 3: Uncle is BLACK and _node is a left child
+                    _resolve_red_parent(_node->m_parent);
+                    _right_rotate(_node->m_parent->m_parent);
+                }
+            } else {
+                _ptr_base _uncle = _node->m_parent->m_parent->m_left;
+                if ( _uncle->m_color == _color::Red ) {
+                    // Case 1: Uncle is red
+                    _resolve_red_uncle(_node->m_parent, _uncle);
+                    _node = _node->m_parent->m_parent;
+                } else {
+                    if ( _node == _node->m_parent->m_left ) {
+                        // Case 2: Uncle is BLACK and _node is a right child
+                        _node = _node->m_parent;
+                        _right_rotate(_node);
+                    }
+                    // Case 3: Uncle is BLACK and _node is a left child
+                    _resolve_red_parent(_node->m_parent);
+                    _left_rotate(_node->m_parent->m_parent);
+                }
+            }
+        }
     }
 
-    template<typename Val, typename KeyOfVal, typename Compare>
-    constexpr rb_tree_node<Val> *rb_tree<Val, KeyOfVal, Compare>::
-    _search(_ptr_const_node _ptr, _const_ptr_const_base _nil, const value_type &_val) {
-        if (_ptr == _nil) {
-            return _ptr;
-        }
+    template <typename Key, typename Val, typename Compare>
+    void rb_tree<Key, Val, Compare>::
+    _resolve_red_uncle(_ptr_base _parent, _ptr_base _uncle) noexcept
+    {
+        _uncle->m_color  = _color::Black;
+        _parent->m_color = _color::Black;
+        _parent->m_parent->m_color = _color::Red;
+    }
 
-        if (_compare(_ptr()->m_valueField, _val)) {
-            return _search(_ptr->m_right, _nil, _val);
-        }
+    template <typename Key, typename Val, typename Compare>
+    void rb_tree<Key, Val, Compare>::_resolve_red_parent(_ptr_base _parent) noexcept
+    {
+        _parent->m_color = _color::Black;
+        _parent->m_parent->m_color = _color::Red;
+    }
 
-        if (_compare(_val, _ptr()->m_valueField)) {
-            return _search(_ptr->m_left, _nil, _val);
-        }
+    template <typename Key, typename Val, typename Compare>
+    void rb_tree<Key, Val, Compare>::_right_rotate(_ptr_node _node) noexcept
+    {
+    }
 
-        return _ptr;
+    template <typename Key, typename Val, typename Compare>
+    void rb_tree<Key, Val, Compare>::_left_rotate(_ptr_node _node) noexcept
+    {
     }
 }
 

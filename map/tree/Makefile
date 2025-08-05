@@ -25,8 +25,8 @@ TARGET = $(LIBDIR)/$(NAME)
 
 # ===== Source files =====
 SRCFILES =	$(shell find $(SRCDIR) -name "*.c")\
-						$(shell find $(SRCDIR) -name "*.cc")\
-						$(shell find $(SRCDIR) -name "*.cpp")
+			$(shell find $(SRCDIR) -name "*.cc")\
+			$(shell find $(SRCDIR) -name "*.cpp")
 
 # ===== Include directories =====
 INCDIRS  = $(shell find $(INCDIR) -type d)
@@ -34,8 +34,8 @@ IFLAGS   = $(foreach dir,$(INCDIRS),-I$(dir))
 
 # ===== Object files =====
 OBJFILES =	$(patsubst %.c,$(OBJDIR)/%.o,$(filter %.c,$(SRCFILES)))\
-						$(patsubst %.cc,$(OBJDIR)/%.o,$(filter %.cc,$(SRCFILES)))\
-						$(patsubst %.cpp,$(OBJDIR)/%.o,$(filter %.cpp,$(SRCFILES)))
+			$(patsubst %.cc,$(OBJDIR)/%.o,$(filter %.cc,$(SRCFILES)))\
+			$(patsubst %.cpp,$(OBJDIR)/%.o,$(filter %.cpp,$(SRCFILES)))
 
 # ===== Include files =====
 INC = $(shell find $(INCDIR) -name "*.h" -o -name "*.hh" -o -name "*.hpp")
@@ -105,6 +105,7 @@ pretty:
 show:
 	@echo "$(_BLUE)SRCFILES:\t$(_YELLOW)$(SRCFILES)$(_NC)"
 	@echo "$(_BLUE)OBJFILES:\t$(_YELLOW)$(OBJFILES)$(_NC)"
+	@echo "$(_BLUE)Compilers:\t$(_YELLOW)$(CXX) $(CC)$(_NC)"
 	@echo "$(_BLUE)CXXFLAGS:\t$(_YELLOW)$(CXXFLAGS)$(_NC)"
+	@echo "$(_BLUE)CCFLAGS:\t$(_YELLOW)$(CCFLAGS)$(_NC)"
 	@echo "$(_BLUE)IFLAGS:\t\t$(_YELLOW)$(IFLAGS)$(_NC)"
-	@echo "$(_BLUE)Compiling:\t$(_YELLOW)$(CXX) $(CXXFLAGS) ...$(_NC)"
