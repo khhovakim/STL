@@ -21,10 +21,10 @@ namespace cxx {
         using _ptr_const_base       = const rb_tree_node_base *;
         using _const_ptr_const_base = const rb_tree_node_base * const;
 
-        _ptr_base m_parent{nullptr}; ///< Pointer to the parent node.
-        _ptr_base m_left{nullptr};   ///< Pointer to the left child node.
-        _ptr_base m_right{nullptr};  ///< Pointer to the right child node.
-        _color m_color{_color::Red}; ///< Color of the node (red or black).
+        _ptr_base m_parent { nullptr };     ///< Pointer to the parent node.
+        _ptr_base m_left   { nullptr };     ///< Pointer to the left child node.
+        _ptr_base m_right  { nullptr };     ///< Pointer to the right child node.
+        _color    m_color  { _color::Red }; ///< Color of the node (red or black).
 
         /// @brief Minimum node in the subtree.
         /// @param _x Pointer to the node from which to find the minimum.
@@ -73,6 +73,29 @@ namespace cxx {
         /// @param _nil Sentinel node representing leaf/null in the Red-Black Tree.
         /// @return Const pointer to the previous node in the in-order traversal.
         static _ptr_const_base _prev(_ptr_const_base _x, _const_ptr_const_base _nil) noexcept;
+
+        /// @brief Resolves the red-uncle case in Red-Black Tree insertion.
+        ///
+        /// This function handles the case when both the parent and the uncle of the newly inserted node are red.
+        /// It recolors the parent and uncle to black and the grandparent to red, then the fix-up continues from
+        /// the grandparent. This helps maintain the Red-Black Tree properties after insertion.
+        ///
+        /// @param _parent Pointer to the parent of the newly inserted node.
+        /// @param _uncle  Pointer to the uncle of the newly inserted node (i.e., sibling of the parent).
+        /// @note This function only performs recoloring; no rotations are done here.
+        /// @see _insertFixUp()
+        static void _resolve_red_uncle(_ptr_base _parent, _ptr_base _uncle) noexcept;
+
+        /// @brief Resolves Red-Black Tree insertion cases when the parent is red and the uncle is black or null.
+        ///
+        /// This function handles the violation of Red-Black Tree properties caused by a red parent
+        /// and a black (or null) uncle. It performs necessary rotations and recoloring to restore balance,
+        /// typically corresponding to **Case 2** and **Case 3** in Red-Black Tree insertion fix-up.
+        ///
+        /// @param _parent Pointer to the parent node of the newly inserted node.
+        /// @note This function assumes the uncle is black or null and that the grandparent exists.
+        /// @see _insertFixUp()
+        static void _resolve_red_parent(_ptr_base _parent) noexcept;
     };
 }
 

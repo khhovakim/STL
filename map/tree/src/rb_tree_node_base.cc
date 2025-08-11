@@ -77,4 +77,17 @@ namespace cxx {
     rb_tree_node_base::_prev(const rb_tree_node_base *_x, const rb_tree_node_base * const _nil) noexcept {
         return _prev(const_cast<rb_tree_node_base *>(_x), _nil);
     }
+
+    void rb_tree_node_base::_resolve_red_uncle(_ptr_base _parent, _ptr_base _uncle) noexcept
+    {
+        _uncle->m_color  = _color::Black;
+        _parent->m_color = _color::Black;
+        _parent->m_parent->m_color = _color::Red;
+    }
+
+    void rb_tree_node_base::_resolve_red_parent(_ptr_base _parent) noexcept
+    {
+        _parent->m_color = _color::Black;
+        _parent->m_parent->m_color = _color::Red;
+    }
 }

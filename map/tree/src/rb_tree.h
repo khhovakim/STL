@@ -216,30 +216,9 @@ namespace cxx {
         /// of Red-Black Tree properties (such as two consecutive red nodes). It performs
         /// the necessary re-coloring and rotations to maintain the tree's balance.
         /// @param _node Pointer to the newly inserted node that may violate Red-Black rules.
-        static void _insert_fix_up(_ptr_node _node);
+        void _insert_fix_up(_ptr_node _node);
 
-        /// @brief Resolves the red-uncle case in Red-Black Tree insertion.
-        ///
-        /// This function handles the case when both the parent and the uncle of the newly inserted node are red.
-        /// It recolors the parent and uncle to black and the grandparent to red, then the fix-up continues from
-        /// the grandparent. This helps maintain the Red-Black Tree properties after insertion.
-        ///
-        /// @param _parent Pointer to the parent of the newly inserted node.
-        /// @param _uncle Pointer to the uncle of the newly inserted node (i.e., sibling of the parent).
-        /// @note This function only performs recoloring; no rotations are done here.
-        /// @see _insertFixUp()
-        static void _resolve_red_uncle(_ptr_base _parent, _ptr_base _uncle) noexcept;
 
-        /// @brief Resolves Red-Black Tree insertion cases when the parent is red and the uncle is black or null.
-        ///
-        /// This function handles the violation of Red-Black Tree properties caused by a red parent
-        /// and a black (or null) uncle. It performs necessary rotations and recoloring to restore balance,
-        /// typically corresponding to **Case 2** and **Case 3** in Red-Black Tree insertion fix-up.
-        ///
-        /// @param _parent Pointer to the parent node of the newly inserted node.
-        /// @note This function assumes the uncle is black or null and that the grandparent exists.
-        /// @see _insertFixUp()
-        static void _resolve_red_parent(_ptr_base _parent) noexcept;
 
         static void _right_rotate(_ptr_node _node) noexcept;
         static void _left_rotate(_ptr_node _node) noexcept;
@@ -365,7 +344,7 @@ namespace cxx {
                 _ptr_base _uncle = _node->m_parent->m_parent->m_right;
                 if ( _uncle->m_color == _color::Red ) {
                     // Case 1: Uncle is red
-                    _resolve_red_uncle(_node->m_parent, _uncle);
+                    _base_type::_resolve_red_uncle(_node->m_parent, _uncle);
                     _node = _node->m_parent->m_parent;
                 } else {
                     if ( _node == _node->m_parent->m_right ) {
@@ -374,14 +353,14 @@ namespace cxx {
                         _left_rotate(_node);
                     }
                     // Case 3: Uncle is BLACK and _node is a left child
-                    _resolve_red_parent(_node->m_parent);
+                    _base_type::_resolve_red_parent(_node->m_parent);
                     _right_rotate(_node->m_parent->m_parent);
                 }
             } else {
                 _ptr_base _uncle = _node->m_parent->m_parent->m_left;
                 if ( _uncle->m_color == _color::Red ) {
                     // Case 1: Uncle is red
-                    _resolve_red_uncle(_node->m_parent, _uncle);
+                    _base_type::_resolve_red_uncle(_node->m_parent, _uncle);
                     _node = _node->m_parent->m_parent;
                 } else {
                     if ( _node == _node->m_parent->m_left ) {
@@ -390,27 +369,12 @@ namespace cxx {
                         _right_rotate(_node);
                     }
                     // Case 3: Uncle is BLACK and _node is a left child
-                    _resolve_red_parent(_node->m_parent);
+                    _base_type::_resolve_red_parent(_node->m_parent);
                     _left_rotate(_node->m_parent->m_parent);
                 }
             }
         }
-    }
-
-    template <typename Key, typename Val, typename Compare>
-    void rb_tree<Key, Val, Compare>::
-    _resolve_red_uncle(_ptr_base _parent, _ptr_base _uncle) noexcept
-    {
-        _uncle->m_color  = _color::Black;
-        _parent->m_color = _color::Black;
-        _parent->m_parent->m_color = _color::Red;
-    }
-
-    template <typename Key, typename Val, typename Compare>
-    void rb_tree<Key, Val, Compare>::_resolve_red_parent(_ptr_base _parent) noexcept
-    {
-        _parent->m_color = _color::Black;
-        _parent->m_parent->m_color = _color::Red;
+        m_root->m_color = _color::Black;
     }
 
     template <typename Key, typename Val, typename Compare>
