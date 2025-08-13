@@ -4,9 +4,10 @@
 # include <bits/c++config.h>     // For std::size_t
 # include <bits/stl_function.h>  // For std::less, std::_Select1st
 # include <bits/stl_pair.h>      // For std::pair
-#include "rb_tree_iterator.h"
-#include "rb_tree_node.h"
-#include "rb_tree_node_base.h"
+
+# include "rb_tree_node_base.h"  // For rb_tree_node_base
+# include "rb_tree_node.h"       // For rb_tree_node
+# include "rb_tree_iterator.h"   // For rb_tree_iterator, rb_tree_const_iterator
 
 namespace cxx {
     /// @brief Red-Black Tree implementation.
@@ -30,11 +31,8 @@ namespace cxx {
         using _node_type            = rb_tree_node<Val>;
         using _base_type            = rb_tree_node_base;
         using _color                = rb_tree_node_base::_color;
-        using _ptr_node             = rb_tree_node<Val> *;
-        using _ptr_const_node       = const rb_tree_node<Val> *;
-        using _ptr_base             = rb_tree_node_base *;
-        using _ptr_const_base       = const rb_tree_node_base *;
-        using _const_ptr_const_base = const rb_tree_node_base * const;
+        using _node_ptr             = rb_tree_node<Val> *;
+        using _base_ptr             = rb_tree_node_base *;
 
     public:
         using value_type      = Val;
@@ -42,8 +40,6 @@ namespace cxx {
         using key_compare     = Compare;
         using pointer         = value_type *;
         using reference       = value_type &;
-        using const_pointer   = const value_type *;
-        using const_reference = const value_type &;
         using size_type       = std::size_t;
 
         explicit rb_tree(const key_compare &comp = key_compare())
@@ -73,7 +69,7 @@ namespace cxx {
         }
 
         /// @brief Returns a pointer to the root node of the tree.
-        constexpr _ptr_const_node getRoot() const {
+        constexpr const _node_ptr getRoot() const {
             return m_root;
         }
 
@@ -86,7 +82,7 @@ namespace cxx {
 
         /// @brief Returns a pointer to the nil (sentinel) node of the tree.
         [[nodiscard]]
-        constexpr _ptr_const_base getNil() const {
+        constexpr const _base_ptr getNil() const {
             return m_nil;
         }
 
@@ -105,20 +101,20 @@ namespace cxx {
 
         /// @brief Returns a pointer to the minimum (leftmost) node in the Red-Black Tree.
         /// @return Pointer to the node with the minimum key.
-        constexpr _ptr_base min() const {
+        constexpr _base_ptr min() const {
             return _base_type::_minimum(m_root, m_nil);
         }
 
         /// @brief Returns a pointer to the maximum (rightmost) node in the Red-Black Tree.
         /// @return Pointer to the node with the maximum key.
-        constexpr _ptr_base max() const {
+        constexpr _base_ptr max() const {
             return _base_type::_maximum(m_root, m_nil);
         }
 
         /// @brief Searches for a node with the given value in the Red-Black Tree.
         /// @param _val The value to search for (comparison is done using the key extracted from it).
         /// @return Pointer to the node containing the value, or `nullptr`/`_nil` if not found.
-        constexpr _ptr_node search(const value_type &_val) const {
+        constexpr _node_ptr search(const value_type &_val) const {
             return _search(m_root, m_nil, _val);
         }
 
@@ -171,20 +167,20 @@ namespace cxx {
         /// @param _ptr Pointer to the root of the subtree.
         /// @return The height of the subtree rooted at `_ptr`. Returns 0 if `_ptr` is null.
         [[nodiscard]]
-        constexpr size_type _height(_ptr_const_base _ptr) const;
+        constexpr size_type _height(const _base_ptr _ptr) const;
         /// @brief Recursively clears all nodes in the Red-Black Tree.
         /// This function deallocates memory and destroys all nodes in the subtree
         /// rooted at the given node. It is typically used during tree destruction
         /// or when resetting the tree.
         /// @param _node Pointer to the root of the subtree to clear.
-        void _clear(_ptr_node _node);
+        void _clear(_node_ptr _node);
         /// @brief Recursively copies nodes from another Red-Black Tree.
         /// This internal helper function is used to deep-copy the structure and values
         /// of another Red-Black Tree into the current tree. It clones the subtree rooted
         /// at `_node`, skipping over the sentinel `_nil` node used in Red-Black Trees.
         /// @param _node Pointer to the current node in the source tree to copy.
         /// @param _nil Sentinel node pointer used to represent leaf (null) nodes in the source tree.
-        void _copy(_ptr_const_node _node, _const_ptr_const_base _nil);
+        void _copy(const _node_ptr _node, const _base_ptr const _nil);
 
         /// @brief Compares two values based on their extracted keys.
         /// @param _x The first value to compare.
@@ -201,32 +197,32 @@ namespace cxx {
         /// @param _nil Sentinel node used to represent leaf/null nodes.
         /// @param _val The value to search for (comparison is based on the key extracted from it).
         /// @return Pointer to the node containing the value, or `_nil` if not found.
-        constexpr _ptr_node
-        _search(_ptr_const_node _ptr, _const_ptr_const_base _nil, const value_type &_val);
+        constexpr _node_ptr
+        _search(const _node_ptr _ptr, const _base_ptr const _nil, const value_type &_val);
 
         /// @brief Internal helper to insert a node into the Red-Black Tree.
         /// @param _node Pointer to the node to insert.
         /// @return A pair consisting of:
         ///   - an iterator to the inserted node (or to the existing one if a duplicate key is found),
         ///   - a boolean indicating whether the insertion was successful (`true` if inserted, `false` if duplicate).
-        std::pair<iterator, bool> _insert(_ptr_node _node);
+        std::pair<iterator, bool> _insert(_node_ptr _node);
 
         /// @brief Restores Red-Black Tree properties after insertion.
         /// This internal function is called after inserting a node to fix any violations
         /// of Red-Black Tree properties (such as two consecutive red nodes). It performs
         /// the necessary re-coloring and rotations to maintain the tree's balance.
         /// @param _node Pointer to the newly inserted node that may violate Red-Black rules.
-        void _insert_fix_up(_ptr_node _node);
+        void _insert_fix_up(_node_ptr _node);
 
 
 
-        static void _right_rotate(_ptr_node _node) noexcept;
-        static void _left_rotate(_ptr_node _node) noexcept;
+        void _right_rotate(_base_ptr _node) noexcept;
+        void _left_rotate (_base_ptr _node) noexcept;
 
         key_compare m_comp;
         size_type m_size;
-        _ptr_node m_root;
-        _ptr_base m_nil;
+        _node_ptr m_root;
+        _base_ptr m_nil;
     };
 
 
@@ -251,7 +247,7 @@ namespace cxx {
 
     template<typename Key, typename Val, typename Compare>
     constexpr std::size_t
-    rb_tree<Key, Val, Compare>::_height(const rb_tree_node_base *_ptr) const {
+    rb_tree<Key, Val, Compare>::_height(const _base_ptr _ptr) const {
         if (_ptr == m_nil) {
             return 0;
         }
@@ -262,7 +258,7 @@ namespace cxx {
     }
 
     template<typename Key, typename Val, typename Compare>
-    void rb_tree<Key, Val, Compare>::_clear(_ptr_node _node) {
+    void rb_tree<Key, Val, Compare>::_clear(_node_ptr _node) {
         if (_node == m_nil) {
             return ;
         }
@@ -275,7 +271,7 @@ namespace cxx {
 
     template<typename Key, typename Val, typename Compare>
     void rb_tree<Key, Val, Compare>::
-    _copy(_ptr_const_node _node, _const_ptr_const_base _nil) {
+    _copy(const _node_ptr _node, const _base_ptr const _nil) {
         if (_node == _nil) {
             return ;
         }
@@ -287,7 +283,7 @@ namespace cxx {
 
     template<typename Key, typename Val, typename Compare>
     constexpr rb_tree_node<Val> *rb_tree<Key, Val, Compare>::
-    _search(_ptr_const_node _ptr, _const_ptr_const_base _nil, const value_type &_val) {
+    _search(const _node_ptr _ptr, const _base_ptr const _nil, const value_type &_val) {
         if ( _ptr == _nil ) {
             return _ptr;
         }
@@ -305,9 +301,9 @@ namespace cxx {
 
     template<typename Key, typename Val, typename Compare>
     std::pair<typename rb_tree<Key, Val, Compare>::iterator, bool>
-    rb_tree<Key, Val, Compare>::_insert(_ptr_node _node) {
-        _ptr_node _current { m_root };
-        _ptr_node _parent  { m_nil  };
+    rb_tree<Key, Val, Compare>::_insert(_node_ptr _node) {
+        _node_ptr _current { m_root };
+        _node_ptr _parent  { m_nil  };
 
         while ( _current != m_nil ) {
             _parent = _current;
@@ -338,37 +334,39 @@ namespace cxx {
     }
 
     template<typename Key, typename Val, typename Compare>
-    void rb_tree<Key, Val, Compare>::_insert_fix_up(_ptr_node _node) {
+    void rb_tree<Key, Val, Compare>::_insert_fix_up(_node_ptr _node) {
         while ( _node->m_parent->m_color == _color::Red ) {
             if ( _node->m_parent == _node->m_parent->m_parent->m_left ) {
-                _ptr_base _uncle = _node->m_parent->m_parent->m_right;
+                _base_ptr _uncle = _node->m_parent->m_parent->m_right;
                 if ( _uncle->m_color == _color::Red ) {
-                    // Case 1: Uncle is red
+                    // Case 1: parent and uncle are red
                     _base_type::_resolve_red_uncle(_node->m_parent, _uncle);
                     _node = _node->m_parent->m_parent;
                 } else {
+                    // parent is red and uncle is BLACK
                     if ( _node == _node->m_parent->m_right ) {
-                        // Case 2: Uncle is BLACK and _node is a right child
+                        // Case 2: _node is a right child
                         _node = _node->m_parent;
                         _left_rotate(_node);
                     }
-                    // Case 3: Uncle is BLACK and _node is a left child
+                    // Case 3: _node is a left child
                     _base_type::_resolve_red_parent(_node->m_parent);
                     _right_rotate(_node->m_parent->m_parent);
                 }
             } else {
-                _ptr_base _uncle = _node->m_parent->m_parent->m_left;
+                _base_ptr _uncle = _node->m_parent->m_parent->m_left;
                 if ( _uncle->m_color == _color::Red ) {
-                    // Case 1: Uncle is red
+                    // Case 1: parent and uncle are red
                     _base_type::_resolve_red_uncle(_node->m_parent, _uncle);
                     _node = _node->m_parent->m_parent;
                 } else {
+                    // parent is red and uncle is BLACK
                     if ( _node == _node->m_parent->m_left ) {
-                        // Case 2: Uncle is BLACK and _node is a right child
+                        // Case 2: _node is a right child
                         _node = _node->m_parent;
                         _right_rotate(_node);
                     }
-                    // Case 3: Uncle is BLACK and _node is a left child
+                    // Case 3: _node is a left child
                     _base_type::_resolve_red_parent(_node->m_parent);
                     _left_rotate(_node->m_parent->m_parent);
                 }
@@ -378,12 +376,13 @@ namespace cxx {
     }
 
     template <typename Key, typename Val, typename Compare>
-    void rb_tree<Key, Val, Compare>::_right_rotate(_ptr_node _node) noexcept
+    void rb_tree<Key, Val, Compare>::_right_rotate(_base_ptr _node) noexcept
     {
+        
     }
 
     template <typename Key, typename Val, typename Compare>
-    void rb_tree<Key, Val, Compare>::_left_rotate(_ptr_node _node) noexcept
+    void rb_tree<Key, Val, Compare>::_left_rotate(_base_ptr _node) noexcept
     {
     }
 }

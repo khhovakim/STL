@@ -4,8 +4,8 @@
 # include <bits/c++config.h>                // For std::ptrdiff_t
 # include <bits/stl_iterator_base_types.h>  // For std::bidirectional_iterator_tag
 
-#include "rb_tree_node_base.h"
-#include "rb_tree_node.h"
+# include "rb_tree_node_base.h"  // For rb_tree_node_base
+# include "rb_tree_node.h"       // For rb_tree_node
 
 namespace cxx {
     /// @brief Iterator for red-black trees.
@@ -15,12 +15,11 @@ namespace cxx {
     struct rb_tree_iterator {
     private:
         using _self                 = rb_tree_iterator;
-        using _ptr_base             = rb_tree_node_base *;
-        using _const_ptr_const_base = const rb_tree_node_base * const;
-        using _ptr_node             = rb_tree_node<T> *;
+        using _base_ptr             = rb_tree_node_base *;
+        using _node_ptr             = rb_tree_node<T> *;
 
     public:
-        using value_type = T;
+        using value_type = T  ;
         using reference  = T &;
         using pointer    = T *;
 
@@ -39,7 +38,7 @@ namespace cxx {
         /// @param _x   Pointer to the base node.
         /// @param _nil Pointer to the nil  node.
         constexpr explicit
-        rb_tree_iterator(_ptr_node _x, _const_ptr_const_base _nil)
+        rb_tree_iterator(_node_ptr _x, const _base_ptr const _nil)
             : m_node{_x}, m_nil{_nil} {
         }
 
@@ -47,13 +46,13 @@ namespace cxx {
         /// Returns a reference to the value stored in the node pointed to by the iterator.
         /// @return Reference to the value.
         constexpr reference
-        operator*() const noexcept { return static_cast<_ptr_node>(m_node)->m_valueField; }
+        operator*() const noexcept { return static_cast<_node_ptr>(m_node)->m_valueField; }
 
         /// @brief Arrow operator.
         /// Returns a pointer to the value stored in the node pointed to by the iterator.
         /// @return Pointer to the value.
         constexpr pointer
-        operator->() const noexcept { return &static_cast<_ptr_node>(m_node)->m_valueField; }
+        operator->() const noexcept { return &static_cast<_node_ptr>(m_node)->m_valueField; }
 
         /// @brief Pre-increment operator.
         /// Moves the iterator to the next node in the tree.
@@ -107,8 +106,8 @@ namespace cxx {
         constexpr bool
         operator!=(const _self &_x) const { return m_node != _x.m_node; }
 
-        _ptr_base m_node;            ///< Pointer to the current node in the tree.
-        _const_ptr_const_base m_nil; ///< Pointer to the nil in the tree.
+        _base_ptr m_node;            ///< Pointer to the current node in the tree.
+        const _base_ptr const m_nil; ///< Pointer to the nil in the tree.
     };
 } // namespace cxx
 
@@ -121,9 +120,8 @@ namespace cxx {
     private:
         using _iterator       = rb_tree_iterator<T>;
         using _self           = rb_tree_const_iterator;
-        using _ptr_base       = const rb_tree_node_base *;
-        using _const_ptr_base = const rb_tree_node_base * const;
-        using _ptr_node       = const rb_tree_node<T> *;
+        using _base_ptr       = const rb_tree_node_base *;
+        using _node_ptr       = const rb_tree_node<T> *;
 
     public:
         using value_type = T;
@@ -145,7 +143,7 @@ namespace cxx {
         /// @param _x Pointer to the base node.
         /// @param _nil Pointer to the nil  node.
         constexpr explicit
-        rb_tree_const_iterator(_ptr_node _x, _const_ptr_base _nil)
+        rb_tree_const_iterator(_node_ptr _x, _base_ptr const _nil)
             : m_node{_x}, m_nil {_nil} {
         }
 
@@ -161,13 +159,13 @@ namespace cxx {
         /// Returns a reference to the value stored in the node pointed to by the const iterator.
         /// @return Reference to the value.
         constexpr reference
-        operator*() const noexcept { return static_cast<_ptr_node>(m_node)->m_valueField; }
+        operator*() const noexcept { return static_cast<_node_ptr>(m_node)->m_valueField; }
 
         /// @brief Arrow operator.
         /// Returns a pointer to the value stored in the node pointed to by the const iterator.
         /// @return Pointer to the value.
         constexpr pointer
-        operator->() const noexcept { return &static_cast<_ptr_node>(m_node)->m_valueField; }
+        operator->() const noexcept { return &static_cast<_node_ptr>(m_node)->m_valueField; }
 
         /// @brief Pre-increment operator.
         /// Moves the const iterator to the next node in the tree.
@@ -221,8 +219,8 @@ namespace cxx {
         constexpr bool
         operator!=(const _self &_x) const { return m_node != _x.m_node; }
 
-        _ptr_base m_node;      ///< Pointer to the current node in the tree.
-        _const_ptr_base m_nil; ///< Pointer to the nil node in the tree.
+        _base_ptr m_node;      ///< Pointer to the current node in the tree.
+        _base_ptr const m_nil; ///< Pointer to the nil node in the tree.
     };
 } // namespace cxx
 

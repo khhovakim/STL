@@ -1,7 +1,7 @@
 #ifndef   RB_TREE_NODE_
 # define  RB_TREE_NODE_
 
-#include "rb_tree_node_base.h"
+# include "rb_tree_node_base.h"  // For rb_tree_node_base
 
 namespace cxx {
     /// @brief class representing a node in a red-black tree.
@@ -11,9 +11,9 @@ namespace cxx {
     /// allowing for efficient insertion, deletion, and traversal operations.
     template<typename ValueType>
     struct rb_tree_node : rb_tree_node_base {
-        using _ptr_node = rb_tree_node *; ///< Pointer type for the node.
+        using _node_ptr = rb_tree_node *; ///< Pointer type for the node.
 
-        ValueType m_valueField{}; ///< The value stored in the node.
+        ValueType m_valueField { }; ///< The value stored in the node.
 
         explicit rb_tree_node(const ValueType &_val)
             : rb_tree_node_base{}, m_valueField{_val} {
